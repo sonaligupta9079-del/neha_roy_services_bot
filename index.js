@@ -34,7 +34,21 @@ bot.action('services', (ctx) => {
     }
   });
 });
+bot.action('buy_1', (ctx) => {
 
+const orderId = generateOrderId()
+
+ctx.reply(`📹 Video Call
+
+💰 Price: ₹350
+🧾 Order ID: #${orderId}
+
+UPI: dipika.bharti@ptyes
+
+Payment karo aur screenshot bhejo.`)
+
+});
+});
 // BUY
 bot.action(/buy_(.+)/, (ctx) => {
   ctx.reply("🛒 Order Received!\n\n👉 Payment karo\n👉 Screenshot bhejo @neharoyyxx\n\nOrder process ho jayega ✅");
