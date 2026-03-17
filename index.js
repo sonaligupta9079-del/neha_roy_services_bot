@@ -21,10 +21,10 @@ bot.action('services', (ctx) => {
   ctx.editMessageText("📋 Available Services:", {
     reply_markup: {
       inline_keyboard: [
-        [{ text: "Instagram Growth ₹2999", callback_data: "buy_1" }],
-        [{ text: "YouTube SEO ₹4500", callback_data: "buy_2" }],
-        [{ text: "Branding Kit ₹3500", callback_data: "buy_3" }],
-        [{ text: "🔙 Back", callback_data: "menu" }]
+        [{ text: "1 Hour video call ₹350", callback_data: "buy_1" }],
+        [{ text: "1 hour sx chat ₹150", callback_data: "buy_2" }],
+        [{ text: "N*de photos ₹50", callback_data: "buy_3" }],
+        [{ text: "🔙 Back", call[{ text: \"🔙 Back\", callback_data: \"menu\" }]back_data: "menu" }]
       ]
     }
   });
