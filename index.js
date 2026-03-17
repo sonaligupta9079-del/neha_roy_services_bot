@@ -4,6 +4,10 @@ const { Telegraf } = require('telegraf');
 const bot = new Telegraf("8491538069:AAFn0NJV78rG4RZ9u3v5pttvVuCzTM6MmV0");
 // ADMIN ID
 const ADMIN_ID = 7921480123;
+
+function generateOrderId() {
+  return Math.floor(100000 + Math.random() * 900000);
+}
 // START
 bot.start((ctx) => {
   ctx.reply("🌟 Welcome to Neha Roy Paid Services\n\nChoose option:", {
