@@ -32,12 +32,12 @@ bot.action('services', (ctx) => {
 
 // BUY
 bot.action(/buy_(.+)/, (ctx) => {
-  ctx.reply("🛒 Order Received!\n\n👉 Payment karo\n👉 Screenshot bhejo @neharoy_official\n\nOrder process ho jayega ✅");
+  ctx.reply("🛒 Order Received!\n\n👉 Payment karo\n👉 Screenshot bhejo @neharoyyxx\n\nOrder process ho jayega ✅");
 });
 
 // CONTACT
 bot.action('contact', (ctx) => {
-  ctx.editMessageText("📞 Contact:\n\nInstagram: @neharoy_official\nWhatsApp: +91XXXXXXXXXX", {
+  ctx.editMessageText("📞 Contact:\n\nInstagram: @neharoyyxx\nWhatsApp: not available", {
     reply_markup: {
       inline_keyboard: [
         [{ text: "🔙 Back", callback_data: "menu" }]
