@@ -47,14 +47,30 @@ bot.action('contact', (ctx) => {
 });
 
 // PAYMENT
-bot.action('payment', (ctx) => {
-  ctx.editMessageText("💰 Payment Info:\n\nUPI: dipika.bharti@ptyes\nName: Dipika Bharti\n\nPayment ke baad screenshot bhejo.", {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "🔙 Back", callback_data: "menu" }]
-      ]
-    }
-  });
+bot.action('payment', async (ctx) => {
+  try {
+    await ctx.replyWithPhoto(
+      { source: './IMG_20260317_180557_447.jpg' },   // QR image file
+      {
+        caption: `
+💳 *Payment Instructions*
+
+UPI ID: dipika.bharti@ptyes
+Name: Dipika Bharti
+
+1️⃣ QR scan karke payment karo  
+2️⃣ Screenshot bot me bhejo  
+3️⃣ Admin verify karke service activate karega
+
+Thanks for choosing our service 🙏
+        `,
+        parse_mode: "Markdown"
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    ctx.reply("❌ Payment info bhejne me error aa gaya.");
+  }
 });
 
 // MENU
