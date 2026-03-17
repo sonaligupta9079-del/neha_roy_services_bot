@@ -50,26 +50,23 @@ bot.action('contact', (ctx) => {
 bot.action('payment', async (ctx) => {
   try {
     await ctx.replyWithPhoto(
-      { source: './IMG_20260317_180557_447.jpg' },   // QR image file
+      { source: './IMG_20260317_180557_447.jpg' },
       {
-        caption: `
-💳 *Payment Instructions*
+        caption: `💳 Payment Instructions
 
 UPI ID: dipika.bharti@ptyes
 Name: Dipika Bharti
 
-1️⃣ QR scan karke payment karo  
-2️⃣ Screenshot bot me bhejo  
+1️⃣ QR scan karke payment karo
+2️⃣ Screenshot bot me bhejo
 3️⃣ Admin verify karke service activate karega
 
-Thanks for choosing our service 🙏
-        `,
-        parse_mode: "Markdown"
+Thanks for choosing our service 🙏`
       }
     );
-  } catch (error) {
-    console.log(error);
-    ctx.reply("❌ Payment info bhejne me error aa gaya.");
+  } catch (err) {
+    console.log(err);
+    ctx.reply("Payment info bhejne me error aa gaya.");
   }
 });
 
