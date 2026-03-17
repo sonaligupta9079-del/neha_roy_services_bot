@@ -1,7 +1,7 @@
 const { Telegraf } = require('telegraf');
 
 // 👇 YAHAN APNA TOKEN DALO
-const bot = new Telegraf("PASTE_YOUR_BOT_TOKEN_HERE");
+const bot = new Telegraf("8491538069:AAFn0NJV78rG4RZ9u3v5pttvVuCzTM6MmV0");
 
 // START
 bot.start((ctx) => {
