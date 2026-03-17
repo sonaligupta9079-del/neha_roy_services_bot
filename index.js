@@ -21,14 +21,11 @@ bot.action('services', (ctx) => {
   ctx.editMessageText("📋 Available Services:", {
     reply_markup: {
       inline_keyboard: [
-        [{ text: "1 Hour video call ₹350", callback_data: "buy_1" }],
-        [{ text: "1 hour sx chat ₹150", callback_data: "buy_2" }],
-        [{ text: "N*de photos ₹50", callback_data: "buy_3" }],
-        [{ text: "🔙 Back", call[{ text: \"🔙 Back\", callback_data: \"menu\" }]back_data: "menu" }]
-      ]
-    }
-  });
-});
+  [{ text: "1 Hour video call ₹350", callback_data: "buy_1" }],
+  [{ text: "1 hour sx chat ₹150", callback_data: "buy_2" }],
+  [{ text: "N*de photos ₹50", callback_data: "buy_3" }],
+  [{ text: "⬅ Back", callback_data: "menu" }]
+]
 
 // BUY
 bot.action(/buy_(.+)/, (ctx) => {
