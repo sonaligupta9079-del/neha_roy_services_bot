@@ -34,24 +34,26 @@ bot.action('services', (ctx) => {
     }
   });
 });
-bot.action('buy_1', (ctx) => {
+
+// BUY
+bot.action(/buy_(.+)/, (ctx) => {
 
 const orderId = generateOrderId()
 
-ctx.reply(`📹 Video Call
+ctx.reply(`🧾 Order Created
 
-💰 Price: ₹350
-🧾 Order ID: #${orderId}
+🆔 Order ID: #${orderId}
 
+💰 Payment Details
 UPI: dipika.bharti@ptyes
+Name: Dipika Bharti
 
-Payment karo aur screenshot bhejo.`)
+1️⃣ UPI se payment karo
+2️⃣ Screenshot bot me bhejo
+3️⃣ Admin verify karegi or service degi 2 minutes me
 
-});
-});
-// BUY
-bot.action(/buy_(.+)/, (ctx) => {
-  ctx.reply("🛒 Order Received!\n\n👉 Payment karo\n👉 Screenshot bhejo @neharoyyxx\n\nOrder process ho jayega ✅");
+Thanks for choosing our service 🙏`)
+
 });
 
 // CONTACT
