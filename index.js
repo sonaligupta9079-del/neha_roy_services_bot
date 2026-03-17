@@ -48,7 +48,7 @@ bot.action('contact', (ctx) => {
 
 // PAYMENT
 bot.action('payment', (ctx) => {
-  ctx.editMessageText("💰 Payment Info:\n\nUPI: neharoy@upi\nName: Neha Roy\n\nPayment ke baad screenshot bhejo.", {
+  ctx.editMessageText("💰 Payment Info:\n\nUPI: dipika.bharti@ptyes\nName: Dipika Bharti\n\nPayment ke baad screenshot bhejo.", {
     reply_markup: {
       inline_keyboard: [
         [{ text: "🔙 Back", callback_data: "menu" }]
