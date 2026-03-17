@@ -2,7 +2,8 @@ const { Telegraf } = require('telegraf');
 
 // 👇 YAHAN APNA TOKEN DALO
 const bot = new Telegraf("8491538069:AAFn0NJV78rG4RZ9u3v5pttvVuCzTM6MmV0");
-
+// ADMIN ID
+const ADMIN_ID = 7921480123;
 // START
 bot.start((ctx) => {
   ctx.reply("🌟 Welcome to Neha Roy Paid Services\n\nChoose option:", {
@@ -82,7 +83,13 @@ bot.action('menu', (ctx) => {
     }
   });
 });
+bot.on("photo", (ctx) => {
 
+  ctx.forwardMessage(ADMIN_ID);
+
+  ctx.reply("✅ Screenshot admin ko bhej diya gaya.\nVerification ke baad service milegi.");
+
+});
 bot.launch();
 
 console.log("Bot Running...");
