@@ -9,16 +9,30 @@ function generateOrderId() {
   return Math.floor(100000 + Math.random() * 900000);
 }
 // START
+const fs = require("fs");
+
 bot.start((ctx) => {
-  ctx.reply("🌟 Welcome to Neha Roy Paid Services\n\nChoose option:", {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "📋 View Services", callback_data: "services" }],
-        [{ text: "📞 Contact", callback_data: "contact" }],
-        [{ text: "💰 Payment Info", callback_data: "payment" }]
-      ]
-    }
-  });
+    const user = ctx.from;
+
+    const userData = `${user.id},${user.username},${user.first_name}\n`;
+
+    // save user
+    fs.appendFileSync("users.txt", userData);
+
+    // admin ko notify
+    ctx.telegram.sendMessage(ADMIN_ID,
+        `New User Joined:\nID: ${user.id}\nUsername: @${user.username}`
+    );
+
+    ctx.reply("👋 Welcome to Neha Roy Paid Services\n\nChoose option:", {
+        reply_markup: {
+            inline_keyboard: [
+                [{ text: "🛒 View Services", callback_data: "services" }],
+                [{ text: "📞 Contact", callback_data: "contact" }],
+                [{ text: "💰 Payment Info", callback_data: "payment" }]
+            ]
+        }
+    });
 });
 
 // SERVICES
