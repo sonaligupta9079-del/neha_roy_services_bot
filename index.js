@@ -39,15 +39,23 @@ bot.start((ctx) => {
     { source: './IMG_20260317_180557_447.jpg' },
     {
       caption: `
-💎 NEHA ROY PREMIUM SERVICES
+💎 WELCOME TO PREMIUM PRIVATE SERVICES
 
-🔥 High Quality Private Services Available
+🔥 Limited Access Available
 
-💰 Affordable Prices
-⚡ Instant Delivery
-🔒 100% Private
+🎯 What You Get:
+🎥 1 Hour Video Call  
+💬 Private Chat  
+📸 Exclusive Content  
 
-👇 Choose option:
+💰 Starting Just ₹50
+
+⚡ Fast Delivery (2–5 min)
+🔒 100% Private & Secure
+
+🚀 Trusted by 10,000+ Users
+
+👇 Choose option below and get instant access👇
       `,
       ...Markup.inlineKeyboard([
         [Markup.button.callback("🛒 View Services", "services")],
