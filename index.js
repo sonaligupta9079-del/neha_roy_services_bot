@@ -2,7 +2,7 @@ const { Telegraf, Markup } = require('telegraf');
 const fs = require("fs");
 
 // TOKEN
-const bot = new Telegraf("8491538069:AAFn0NJV78rG4RZ9u3v5pttvVuCzTM6MmV0");
+const bot = new Telegraf("YOUR_BOT_TOKEN");
 
 // ADMIN
 const ADMIN_ID = 7921480123;
@@ -17,6 +17,10 @@ function saveUsers() {
   fs.writeFileSync("users.json", JSON.stringify(users, null, 2));
 }
 
+function getUserCount() {
+  return Object.keys(users).length;
+}
+
 // ===== ORDER ID =====
 function generateOrderId() {
   return Math.floor(100000 + Math.random() * 900000);
@@ -26,20 +30,24 @@ function generateOrderId() {
 bot.start((ctx) => {
   const user = ctx.from;
 
-  // save user
-  users[user.id] = { premium: false };
-  saveUsers();
+  // save user (duplicate safe)
+  if (!users[user.id]) {
+    users[user.id] = { premium: false };
+    saveUsers();
 
-  // notify admin
-  ctx.telegram.sendMessage(ADMIN_ID,
-    `👤 New User\nID: ${user.id}\nUsername: @${user.username}`
-  );
+    // notify admin only new user
+    ctx.telegram.sendMessage(ADMIN_ID,
+      `👤 New User\nID: ${user.id}\nUsername: @${user.username}`
+    );
+  }
 
   ctx.replyWithPhoto(
     { source: './IMG_20260317_180557_447.jpg' },
     {
       caption: `
 💎 WELCOME TO PREMIUM PRIVATE SERVICES
+
+👥 Total Users: ${getUserCount()}
 
 🔥 Limited Access Available
 
@@ -50,12 +58,7 @@ bot.start((ctx) => {
 
 💰 Starting Just ₹50
 
-⚡ Fast Delivery (2–5 min)
-🔒 100% Private & Secure
-
-🚀 Trusted by 10,000+ Users
-
-👇 Choose option below and get instant access👇
+👇 Choose option below 👇
       `,
       ...Markup.inlineKeyboard([
         [Markup.button.callback("🛒 View Services", "services")],
@@ -69,6 +72,8 @@ bot.start((ctx) => {
 // ===== SERVICES =====
 bot.action('services', (ctx) => {
   ctx.editMessageCaption(`📋 Available Services:
+
+👥 Users: ${getUserCount()}
 
 1️⃣ 1 Hour Video Call – ₹350  
 2️⃣ 1 Hour Chat – ₹150  
@@ -95,42 +100,30 @@ bot.action(/buy_(.+)/, (ctx) => {
 
 💳 Payment Details:
 UPI: dipika.bharti@ptyes
-Name: Dipika Bharti
 
-1️⃣ UPI se payment karo  
+1️⃣ Payment karo  
 2️⃣ Screenshot bhejo  
 3️⃣ 2 min me service milegi  
-
-🙏 Thanks for choosing us
   `);
 });
 
 // ===== PAYMENT =====
 bot.action('payment', async (ctx) => {
-  ctx.replyWithPhoto(
-    { source: './IMG_20260317_180557_447.jpg' },
-    {
-      caption: `
+  ctx.reply(`
 💳 Payment Info
 
 UPI: dipika.bharti@ptyes
-Name: Dipika Bharti
 
-✔ Payment karo  
-✔ Screenshot bhejo  
-✔ Instant service milegi
-      `
-    }
-  );
+✔ Screenshot bhejo after payment
+  `);
 });
 
 // ===== CONTACT =====
 bot.action('contact', (ctx) => {
   ctx.editMessageCaption(`
-📞 Contact Info:
+📞 Contact:
 
-Instagram: @neharoyyxx  
-WhatsApp: Not Available
+Instagram: @neharoyyxx
   `, {
     ...Markup.inlineKeyboard([
       [Markup.button.callback("⬅ Back", "menu")]
@@ -140,7 +133,9 @@ WhatsApp: Not Available
 
 // ===== MENU =====
 bot.action('menu', (ctx) => {
-  ctx.editMessageCaption("🏠 Main Menu", {
+  ctx.editMessageCaption(`🏠 Main Menu
+
+👥 Total Users: ${getUserCount()}`, {
     ...Markup.inlineKeyboard([
       [Markup.button.callback("🛒 View Services", "services")],
       [Markup.button.callback("💰 Payment Info", "payment")],
@@ -154,10 +149,9 @@ bot.on("photo", (ctx) => {
   const userId = ctx.from.id;
 
   ctx.forwardMessage(ADMIN_ID);
+  ctx.reply("✅ Screenshot sent. Wait for approval...");
 
-  ctx.reply("✅ Screenshot admin ko bhej diya gaya.\nWait for verification...");
-
-  bot.telegram.sendMessage(ADMIN_ID, `📩 Payment from user: ${userId}`);
+  bot.telegram.sendMessage(ADMIN_ID, `📩 Payment from: ${userId}`);
 });
 
 // ===== ADMIN APPROVE =====
@@ -170,7 +164,7 @@ bot.command("approve", (ctx) => {
   users[userId] = { premium: true };
   saveUsers();
 
-  bot.telegram.sendMessage(userId, "🎉 Payment verified! Service activated.");
+  bot.telegram.sendMessage(userId, "🎉 Payment verified!");
   ctx.reply("✅ Approved");
 });
 
@@ -182,6 +176,50 @@ bot.command("reject", (ctx) => {
   bot.telegram.sendMessage(userId, "❌ Payment rejected.");
 
   ctx.reply("Rejected");
+});
+
+// ===== 🔥 BROADCAST TEXT =====
+bot.command("broadcast", async (ctx) => {
+  if (ctx.from.id !== ADMIN_ID) return;
+
+  const msg = ctx.message.text.replace("/broadcast ", "");
+  const ids = Object.keys(users);
+
+  let success = 0, fail = 0;
+
+  for (let id of ids) {
+    try {
+      await bot.telegram.sendMessage(id, msg);
+      success++;
+    } catch {
+      fail++;
+    }
+  }
+
+  ctx.reply(`✅ Broadcast Done\n👥 ${success} Success\n❌ ${fail} Failed`);
+});
+
+// ===== 🔥 BROADCAST PHOTO =====
+bot.on("photo", async (ctx, next) => {
+  if (ctx.from.id !== ADMIN_ID) return next();
+
+  const ids = Object.keys(users);
+  let success = 0, fail = 0;
+
+  for (let id of ids) {
+    try {
+      await bot.telegram.sendPhoto(
+        id,
+        ctx.message.photo[ctx.message.photo.length - 1].file_id,
+        { caption: ctx.message.caption || "" }
+      );
+      success++;
+    } catch {
+      fail++;
+    }
+  }
+
+  ctx.reply(`📸 Photo Broadcast Done\n✅ ${success}\n❌ ${fail}`);
 });
 
 bot.launch();
