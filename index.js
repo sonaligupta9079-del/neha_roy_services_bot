@@ -1,38 +1,56 @@
 const { Telegraf } = require('telegraf');
+const OpenAI = require("openai");
+const fs = require("fs");
 
-// 👇 YAHAN APNA TOKEN DALO
-const bot = new Telegraf("8491538069:AAFn0NJV78rG4RZ9u3v5pttvVuCzTM6MmV0");
+// TOKENS (Railway env use karo)
+const bot = new Telegraf(process.env.BOT_TOKEN);
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 // ADMIN ID
 const ADMIN_ID = 7921480123;
+
+// USER DATA (AI earning system)
+let users = {};
 
 function generateOrderId() {
   return Math.floor(100000 + Math.random() * 900000);
 }
+
 // START
-const fs = require("fs");
-
 bot.start((ctx) => {
-    const user = ctx.from;
+  const user = ctx.from;
 
-    const userData = `${user.id},${user.username},${user.first_name}\n`;
+  const userData = `${user.id},${user.username},${user.first_name}\n`;
+  fs.appendFileSync("users.txt", userData);
 
-    // save user
-    fs.appendFileSync("users.txt", userData);
+  if (!users[user.id]) {
+    users[user.id] = { count: 0, paid: false };
+  }
 
-    // admin ko notify
-    ctx.telegram.sendMessage(ADMIN_ID,
-        `New User Joined:\nID: ${user.id}\nUsername: @${user.username}`
-    );
+  ctx.telegram.sendMessage(ADMIN_ID,
+    `New User Joined:\nID: ${user.id}\nUsername: @${user.username}`
+  );
 
-    ctx.reply("👋 Welcome to Neha Roy Paid Services\n\nChoose option:", {
-        reply_markup: {
-            inline_keyboard: [
-                [{ text: "🛒 View Services", callback_data: "services" }],
-                [{ text: "📞 Contact", callback_data: "contact" }],
-                [{ text: "💰 Payment Info", callback_data: "payment" }]
-            ]
-        }
-    });
+  ctx.reply(
+    "👋 Welcome to Neha Roy Paid Services\n\n🤖 AI Chat Available (5 free msgs)\n💰 After that ₹49\n\nChoose option:",
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "🛒 View Services", callback_data: "services" }],
+          [{ text: "🤖 AI Chat", callback_data: "ai_chat" }],
+          [{ text: "📞 Contact", callback_data: "contact" }],
+          [{ text: "💰 Payment Info", callback_data: "payment" }]
+        ]
+      }
+    }
+  );
+});
+
+// AI BUTTON
+bot.action("ai_chat", (ctx) => {
+  ctx.reply("🤖 AI Mode ON\n\nKuch bhi pucho...");
 });
 
 // SERVICES
@@ -51,10 +69,9 @@ bot.action('services', (ctx) => {
 
 // BUY
 bot.action(/buy_(.+)/, (ctx) => {
+  const orderId = generateOrderId();
 
-const orderId = generateOrderId()
-
-ctx.reply(`🧾 Order Created
+  ctx.reply(`🧾 Order Created
 
 🆔 Order ID: #${orderId}
 
@@ -62,17 +79,16 @@ ctx.reply(`🧾 Order Created
 UPI: dipika.bharti@ptyes
 Name: Dipika Bharti
 
-1️⃣ UPI se payment karo
-2️⃣ Screenshot bot me bhejo
-3️⃣ Admin verify karegi or service degi 2 minutes me
+1️⃣ Payment karo
+2️⃣ Screenshot bhejo
+3️⃣ Admin verify karegi
 
-Thanks for choosing our service 🙏`)
-
+🙏 Thanks`);
 });
 
 // CONTACT
 bot.action('contact', (ctx) => {
-  ctx.editMessageText("📞 Contact:\n\nInstagram: @neharoyyxx\nWhatsApp: not available", {
+  ctx.editMessageText("📞 Contact:\nInstagram: @neharoyyxx", {
     reply_markup: {
       inline_keyboard: [
         [{ text: "🔙 Back", callback_data: "menu" }]
@@ -83,26 +99,16 @@ bot.action('contact', (ctx) => {
 
 // PAYMENT
 bot.action('payment', async (ctx) => {
-  try {
-    await ctx.replyWithPhoto(
-      { source: './IMG_20260317_180557_447.jpg' },
-      {
-        caption: `💳 Payment Instructions
+  await ctx.replyWithPhoto(
+    { source: './IMG_20260317_180557_447.jpg' },
+    {
+      caption: `💳 Payment
 
-UPI ID: dipika.bharti@ptyes
-Name: Dipika Bharti
+UPI: dipika.bharti@ptyes
 
-1️⃣ QR scan karke payment karo
-2️⃣ Screenshot bot me bhejo
-3️⃣ Admin verify karke service activate karega
-
-Thanks for choosing our service 🙏`
-      }
-    );
-  } catch (err) {
-    console.log(err);
-    ctx.reply("Payment info bhejne me error aa gaya.");
-  }
+Screenshot bhejo after payment`
+    }
+  );
 });
 
 // MENU
@@ -111,19 +117,61 @@ bot.action('menu', (ctx) => {
     reply_markup: {
       inline_keyboard: [
         [{ text: "📋 View Services", callback_data: "services" }],
+        [{ text: "🤖 AI Chat", callback_data: "ai_chat" }],
         [{ text: "📞 Contact", callback_data: "contact" }],
         [{ text: "💰 Payment Info", callback_data: "payment" }]
       ]
     }
   });
 });
+
+// SCREENSHOT → ADMIN
 bot.on("photo", (ctx) => {
-
   ctx.forwardMessage(ADMIN_ID);
-
-  ctx.reply("✅ Screenshot admin ko bhej diya gaya.\nVerification ke baad service milegi.");
-
+  ctx.reply("✅ Screenshot admin ko bhej diya gaya.");
 });
-bot.launch();
 
+// ADMIN APPROVE (AI unlock)
+bot.command("approve", (ctx) => {
+  if (ctx.from.id !== ADMIN_ID) return;
+
+  const userId = ctx.message.text.split(" ")[1];
+
+  if (users[userId]) {
+    users[userId].paid = true;
+    ctx.telegram.sendMessage(userId, "✅ AI Unlocked 🎉");
+    ctx.reply("User approved");
+  }
+});
+
+// 🤖 AI MESSAGE HANDLER
+bot.on("text", async (ctx) => {
+  const id = ctx.from.id;
+  const text = ctx.message.text;
+
+  if (text.startsWith("/")) return;
+
+  if (!users[id]) users[id] = { count: 0, paid: false };
+
+  // LIMIT
+  if (users[id].count >= 5 && !users[id].paid) {
+    return ctx.reply("❌ Free limit khatam\n₹49 pay karo AI unlock ke liye");
+  }
+
+  users[id].count++;
+
+  try {
+    const res = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: text }],
+    });
+
+    ctx.reply(res.choices[0].message.content);
+  } catch (err) {
+    console.log(err);
+    ctx.reply("⚠️ Error");
+  }
+});
+
+bot.launch();
 console.log("Bot Running...");
